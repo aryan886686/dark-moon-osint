@@ -1,22 +1,23 @@
 'use client'
-import { useState } from 'react'
+import { use, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 
-export default function FeaturePage({ params }: { params: { feature: string } }) {
+export default function FeaturePage({ params }: { params: Promise<{ feature: string }> }) {
+  const { feature } = use(params)
   const [query, setQuery] = useState('')
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  
+
   const handleQuery = async () => {
     if (!query.trim()) return
     setLoading(true)
     setError('')
     setResult(null)
-    
+
     try {
-      const res = await fetch(`/api/query/${params.feature}?input=${encodeURIComponent(query)}`)
+      const res = await fetch(`/api/query/${feature}?input=${encodeURIComponent(query)}`)
       const data = await res.json()
       if (!res.ok) throw new Error(data.error)
       setResult(data)
@@ -26,18 +27,18 @@ export default function FeaturePage({ params }: { params: { feature: string } })
       setLoading(false)
     }
   }
-  
+
   return (
     <div className="min-h-screen p-6 md:p-10">
       <Link href="/dashboard" className="text-gray-400 hover:text-white mb-8 inline-block">
         ← Back to Dashboard
       </Link>
-      
+
       <div className="max-w-4xl mx-auto">
         <h1 className="text-4xl font-bold gradient-text mb-2 capitalize">
-          {params.feature.replace(/-/g, ' ')}
+          {feature.replace(/-/g, ' ')}
         </h1>
-        
+
         <div className="glass rounded-xl p-6 mb-8">
           <div className="flex gap-4">
             <input
@@ -57,7 +58,7 @@ export default function FeaturePage({ params }: { params: { feature: string } })
             </button>
           </div>
         </div>
-        
+
         <AnimatePresence mode="wait">
           {error && (
             <motion.div
@@ -69,7 +70,7 @@ export default function FeaturePage({ params }: { params: { feature: string } })
               {error}
             </motion.div>
           )}
-          
+
           {result && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}

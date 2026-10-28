@@ -1,10 +1,17 @@
 'use client'
+
+// Next.js ko bolo ki is page ko build time pe static mat banao
+export const dynamic = 'force-dynamic'
+
 import { use, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'frime-motion'
 import Link from 'next/link'
 
 export default function FeaturePage({ params }: { params: Promise<{ feature: string }> }) {
-  const { feature } = use(params)
+  // use() hook se Promise resolve karo
+  const resolvedParams = use(params)
+  const feature = resolvedParams.feature
+  
   const [query, setQuery] = useState('')
   const [result, setResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -19,7 +26,7 @@ export default function FeaturePage({ params }: { params: Promise<{ feature: str
     try {
       const res = await fetch(`/api/query/${feature}?input=${encodeURIComponent(query)}`)
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error)
+      if (!res.ok) throw new Error(data.error || 'Query failed')
       setResult(data)
     } catch (err: any) {
       setError(err.message)
@@ -52,9 +59,9 @@ export default function FeaturePage({ params }: { params: Promise<{ feature: str
             <button
               onClick={handleQuery}
               disabled={loading}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-medium disabled:opacity-50"
+              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg font-medium disabled:opacity-50 transition-opacity"
             >
-              {loading ? '...' : 'QUERY'}
+              {loading ? 'QUERYING...' : 'QUERY'}
             </button>
           </div>
         </div>
@@ -62,10 +69,10 @@ export default function FeaturePage({ params }: { params: Promise<{ feature: str
         <AnimatePresence mode="wait">
           {error && (
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400"
+              className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 mb-4"
             >
               {error}
             </motion.div>
@@ -78,11 +85,11 @@ export default function FeaturePage({ params }: { params: Promise<{ feature: str
               className="glass rounded-xl p-6"
             >
               <h3 className="text-lg font-bold mb-4 text-purple-400">Results</h3>
-              <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm text-gray-300">
+              <pre className="bg-black/50 p-4 rounded-lg overflow-x-auto text-sm text-gray-300 border border-white/5">
                 {JSON.stringify(result.data, null, 2)}
               </pre>
             </motion.div>
-          )}
+            )}
         </AnimatePresence>
       </div>
     </div>

@@ -1,14 +1,10 @@
 'use client'
 
-// Next.js ko bolo ki is page ko build time pe static mat banao
-export const dynamic = 'force-dynamic'
-
 import { use, useState } from 'react'
-import { motion, AnimatePresence } from 'frime-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 
 export default function FeaturePage({ params }: { params: Promise<{ feature: string }> }) {
-  // use() hook se Promise resolve karo
   const resolvedParams = use(params)
   const feature = resolvedParams.feature
   
@@ -89,7 +85,7 @@ export default function FeaturePage({ params }: { params: Promise<{ feature: str
                 {JSON.stringify(result.data, null, 2)}
               </pre>
             </motion.div>
-            )}
+          )}
         </AnimatePresence>
       </div>
     </div>
